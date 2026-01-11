@@ -1,0 +1,283 @@
+{% extends 'base.html' %} 
+{% block title %}Robot Solver Pyraminx{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center"><i class="fas fa-robot me-2"></i> Contrôle du Robot Solveur</h1>
+    <p class="text-center text-muted">Gérez la connexion au Raspberry Pi et lancez la résolution du Pyraminx scanné.</p>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow mb-4">
+                <div class="card-header bg-dark text-white">
+                    <i class="fas fa-link me-2"></i> Statut et Configuration du Pi
+                </div>
+                <div class="card-body">
+                    <form id="connectionForm">
+                        <div class="mb-3">
+                            <label for="piAddress" class="form-label">Adresse IP du Raspberry Pi / Robot</label>
+                            <input type="text" class="form-control" id="piAddress" value="X.X.X.X" required>
+                            <div class="form-text">Ex: 192.168.1.10</div>
+                            <script>
+                                    const hostname = window.location.hostname;
+                                    
+                                    document.getElementById('piAddress').value = hostname || '127.0.0.1';
+                            </script>
+
+
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3" id="connectBtn">
+                            <i class="fas fa-plug me-2"></i> Tester la Connexion
+                        </button>
+                        
+                    </form>
+
+                    <div id="statusDisplay" class="p-3 border rounded">
+                        <h5>Statut du Robot: <span class="badge bg-secondary" id="robotStatus">Déconnecté</span></h5>
+                        <p class="mb-0">
+                            Version OS: <code id="osVersion">Chargement...</code><br>
+                            Adresse IP confirmée: <code id="ipConfirmed">N/A</code><br>
+                            État du mécanisme: <code id="mechanismState">Inconnu</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header bg-danger text-white">
+                    <i class="fas fa-cogs me-2"></i> Lancement de la Résolution
+                </div>
+                <div class="card-body">
+                    
+                    <h5 class="mb-3">Pyraminx Scanné: <span class="badge bg-info text-dark" id="scanStatus"></span></h5>
+
+                    <div class="mb-3">
+                        <label for="algoSelector" class="form-label">Sélectionner l'Algorithme de Résolution</label>
+                        <select class="form-select" id="algoSelector" disabled>
+                            <option value="FMC" selected>FMC (Fewest Move Count)</option>
+                            <option value="NORMAL" disabled>Normal (Débutant)</option>
+                        </select>
+                        <div class="form-text">L'algorithme choisi sera transmis au Raspberry Pi.</div>
+                    </div>
+                    
+                    <button id="launchResolutionBtn" class="btn btn-success w-100 btn-lg" disabled>
+                        <i class="fas fa-play me-2"></i> Lancer la Résolution du Robot
+                    </button>
+
+                    <div id="resolutionLog" class="mt-4 p-3 bg-light rounded" style="max-height: 150px; overflow-y: auto;">
+                        <p class="text-muted mb-0">Logs de commande:</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Flask écrit la variable directement ici.
+    // Plus besoin de fetcher /api/get_pyraminx_state au démarrage !
+    window.SERVER_STATE = {{ etat_initial | tojson | safe }};
+    
+    console.log("État injecté par le serveur :", window.SERVER_STATE);
+
+
+
+
+
+    const piAddressInput = document.getElementById('piAddress');
+    const connectBtn = document.getElementById('connectBtn');
+    const robotStatusSpan = document.getElementById('robotStatus');
+    const osVersionCode = document.getElementById('osVersion');
+    const ipConfirmedCode = document.getElementById('ipConfirmed');
+    const mechanismStateCode = document.getElementById('mechanismState');
+    const scanStatusSpan = document.getElementById('scanStatus');
+    const algoSelector = document.getElementById('algoSelector');
+    const launchResolutionBtn = document.getElementById('launchResolutionBtn');
+    const resolutionLog = document.getElementById('resolutionLog');
+    
+    let lastKnownState = null; 
+
+    // --- 1. UTILS ---
+    function log(message, type = 'info') {
+        const color = type === 'error' ? 'text-danger' : (type === 'success' ? 'text-success' : 'text-muted');
+        resolutionLog.innerHTML += `<p class="mb-0 small ${color}">${new Date().toLocaleTimeString()} - ${message}</p>`;
+        resolutionLog.scrollTop = resolutionLog.scrollHeight;
+    }
+
+    function updateUiForConnection(isConnected, piInfo = {}) {
+        robotStatusSpan.className = `badge bg-${isConnected ? 'success' : 'danger'}`;
+        robotStatusSpan.innerText = isConnected ? 'Connecté & Prêt' : 'Déconnecté';
+        
+        // Enable resolution only if connected AND scan is complete
+        launchResolutionBtn.disabled = !(isConnected && lastKnownState);
+        algoSelector.disabled = !isConnected;
+        
+        if (isConnected) {
+            osVersionCode.innerText = piInfo.os_version || 'Linux (Pi)';
+            ipConfirmedCode.innerText = piInfo.ip_address || piAddressInput.value;
+            mechanismStateCode.innerText = piInfo.mechanism_state || 'Initialisé';
+        } else {
+            osVersionCode.innerText = '---';
+            ipConfirmedCode.innerText = 'N/A';
+            mechanismStateCode.innerText = 'Inconnu';
+        }
+    }
+
+    // --- 2. CONNECT TO PI ---
+    document.getElementById('connectionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const server_ip = window.location.hostname;
+
+        const address = piAddressInput.value;
+        log(`Tentative de connexion au système...`);
+        connectBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Connexion...';
+        connectBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/robot/connect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip: address })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                log('✅ Robot détecté. Système prêt.', 'success');
+                updateUiForConnection(true, data.info);
+            } else {
+                log(`❌ Erreur: ${data.error}`, 'error');
+                updateUiForConnection(false);
+            }
+        } catch (error) {
+            log('❌ Erreur réseau. Vérifiez que Flask tourne sur le Pi.', 'error');
+            updateUiForConnection(false);
+        } finally {
+            connectBtn.innerHTML = '<i class="fas fa-plug me-2"></i> Tester la Connexion';
+            connectBtn.disabled = false;
+        }
+    });
+
+    // --- 3. LAUNCH SOLVER ---
+    launchResolutionBtn.addEventListener('click', async () => {
+        if (!lastKnownState) return;
+
+        const selectedAlgo = algoSelector.value;
+        log(`🚀 Envoi de la séquence au robot (Algo: ${selectedAlgo})...`);
+        launchResolutionBtn.disabled = true;
+        mechanismStateCode.innerText = 'Mouvement en cours...';
+
+        try {
+            const response = await fetch('/api/robot/solve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    config: lastKnownState,
+                    algorithm: selectedAlgo 
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                log(`Séquence calculée : ${data.sequence}`, 'success');
+                log(`Temps estimé : ${data.estimated_time} secondes.`);
+            } else {
+                log(`🛑 Échec : ${data.error}`, 'error');
+                mechanismStateCode.innerText = 'Erreur';
+            }
+        } catch (error) {
+            log('❌ Erreur de communication avec le moteur.', 'error');
+        } finally {
+            // Re-enable after a delay or based on a "finish" signal
+            setTimeout(() => {
+                launchResolutionBtn.disabled = false;
+                mechanismStateCode.innerText = 'Prêt / Idle';
+            }, 3000); 
+        }
+    });
+
+    // --- 4. LOAD SCAN STATE ---
+    async function checkScanState() {
+        // On regarde si Flask nous a donné l'état
+        if (window.SERVER_STATE && Object.keys(window.SERVER_STATE).length > 0) {
+            
+            lastKnownState = window.SERVER_STATE;
+            
+            // Vérification simple : Est-ce qu'on a les 4 faces ?
+            const faces = ['FRONT','RIGHT', 'LEFT', 'BOTTOM'];
+            const isComplete = faces.every(f => 
+                lastKnownState[f] && 
+                lastKnownState[f].length === 9 && 
+                !lastKnownState[f].includes("INCONNU")
+            );
+
+            if (isComplete) {
+                scanStatusSpan.className = 'badge bg-success';
+                scanStatusSpan.innerText = 'Pyraminx Complet';
+                log('Chargé via injection serveur.');
+            } else {
+                scanStatusSpan.className = 'badge bg-warning text-dark';
+                scanStatusSpan.innerText = 'Scan Incomplet';
+            }
+        } else {
+            scanStatusSpan.className = 'badge bg-danger';
+            scanStatusSpan.innerText = 'Aucun Scan';
+        }
+    }
+
+    window.onload = () => {
+        updateUiForConnection(false);
+
+        checkScanState();
+    };
+
+    // --- 5. LOGS TEMPS RÉEL (SSE) ---
+    function setupEventStream() {
+        const source = new EventSource("/stream-logs");
+
+        source.onmessage = function(event) {
+            const msg = event.data;
+            
+            // Ignore les pings
+            if (msg === 'ping') return;
+
+            // Affichage dans ton encadré de logs
+            log(msg, 'info'); 
+            
+            // Logique optionnelle : Détecter la fin
+            if (msg.includes("Résolution terminée")) {
+                mechanismStateCode.innerText = 'Terminé';
+                launchResolutionBtn.disabled = false;
+            }
+        };
+
+        source.onerror = function(err) {
+            console.warn("Perte connexion logs, reconnexion...");
+            source.close();
+            // Réessaie dans 5 secondes
+            setTimeout(setupEventStream, 5000);
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupEventStream(); 
+        
+        setTimeout(() => {
+            const connectBtn = document.getElementById("connectBtn");
+            if (connectBtn) {
+                connectBtn.click();
+            }
+        }, 2000); 
+    });
+
+
+</script>
+{% endblock %}
+
+

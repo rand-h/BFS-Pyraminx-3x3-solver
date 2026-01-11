@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Pyraminx 3D - Ultimate</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+</head> 
+<body>
+
+<div id="solved-banner">🏆 SOLVED !</div>
+
+<div id="ui">
+    <a href="/" style="position:absolute;"> 
+        <i class="fa-solid fa-house"></i>
+    </a>
+  <h3>Pyraminx 3D</h3>
+  <div id="status" style="color:yellow; text-align:center; font-size:12px; margin-bottom:5px;">Prêt</div>
+  
+  <div class="action-group">
+      <input type="text" id="algoInput" placeholder="Algo (ex: R U R' U')">
+      <button onclick="runAlgorithm()">▶ Exécuter Algo</button>
+  </div>
+
+  
+  <div class="controls">
+    <strong>Souris / Tactile :</strong><br>
+    • Swipe sur zones = Tourner<br>
+    • Maintenir = Caméra<br>
+    <hr>
+    <strong>Clavier :</strong><br>
+    • Pointes : <kbd>u</kbd> <kbd>l</kbd> <kbd>r</kbd> <kbd>b</kbd><br>
+    • Étages : <kbd>U</kbd> <kbd>L</kbd> <kbd>R</kbd> <kbd>B</kbd><br>
+    <small>(+ <kbd>CTRL</kbd> pour sens inverse)</small>
+  </div>
+
+  <div id="hide-description">
+      <button id="hide-controls">⬇</button>
+      <script>
+          document.getElementById('hide-controls').addEventListener('click', () => {
+              const controls = document.querySelector('.controls');
+              if (controls.style.display === 'none') {
+                  controls.style.display = 'block';
+                  document.getElementById('hide-controls').textContent = '⬆';
+              } else {
+                  controls.style.display = 'none';
+                  document.getElementById('hide-controls').textContent = '⬇';
+              }
+          });
+
+          setTimeout(() => {
+              document.getElementById('hide-controls').click();
+          }, 5000); // Cache après 5 secondes
+        </script>
+  </div>
+</div>
+
+<div id="orientation">Face: FRONT</div>
+
+
+
+<div id="move-buttons">
+    <button id="btn-reset" style="position: relative; align-items: center; justify-content: center; transfrom: scale(1.2);" onclick="reset()"><ion-icon name="refresh-outline"></ion-icon>
+    </button>
+
+    <script>
+        reset = function() {
+            // La méthode la plus fiable pour tout remettre à zéro (Moteur 3D + Logique)
+            // c'est de recharger la page.
+            window.location.reload();
+        };
+    </script>
+
+    <button id="btn-shuffle" style="position: relative; align-items: center; justify-content: center;" onclick="scramble()">🎲 
+        <span style="
+            transform: scale(0.8) translateX(-60%);
+            position: absolute;
+            left: 50%;
+        ">shuffle</span>
+    </button>
+    
+    <button type="button" data-m="l">l</button>
+    <button type="button" data-m="r">r</button>
+    <button type="button" data-m="u">u</button>
+    <button type="button" data-m="b">b</button>
+
+    <button type="button" data-m="L">L</button>
+    <button type="button" data-m="R">R</button>
+    <button type="button" data-m="U">U</button>
+    <button type="button" data-m="B">B</button>
+
+    <label style="display: flex; align-items: center; font-size: 12px; color: #eee; user-select: none; flex-direction:column;">
+        <input type="checkbox" id="invert-checkbox">
+        <span style="margin-left: 6px;">Inverser</span>
+    </label>
+</div>
+
+<script>
+   // On attend que tout soit chargé (y compris ton script principal qui définit `game`)
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('move-buttons');
+    const checkbox = document.getElementById('invert-checkbox');
+
+    // Fonction pour simuler un mouvement
+    window.performMove = function(key, inverse = checkbox.checked) {
+        if (typeof game !== 'undefined' && game && game.simulateKeyPress) {
+            game.simulateKeyPress(key, inverse);
+        } else {
+            console.warn("game.simulateKeyPress n'est pas encore disponible");
+        }
+    };
+
+    // Met à jour l'affichage des boutons (ajoute/supprime le ')
+    function updateButtonLabels() {
+        const shouldBePrime = checkbox.checked;
+        container.querySelectorAll('button[data-m]').forEach(btn => {
+            const base = btn.dataset.m;
+            const isTip = base === base.toLowerCase();
+
+            // Met à jour le texte et le titre du bouton
+            btn.textContent = shouldBePrime ? base + "'" : base;
+            btn.title = shouldBePrime
+                ? base + "' (anti-horaire)"
+                : base + (isTip ? " (pointe)" : " (layer horaire)");
+
+            // Supprime l'écouteur d'événement précédent pour éviter les doublons
+            btn.onclick = null;
+            btn.addEventListener('click', () => {
+                performMove(base, checkbox.checked);
+            });
+        });
+    }
+
+    // Écouteur sur la checkbox
+    checkbox.addEventListener('change', updateButtonLabels);
+
+    // Affichage une fois que tout est prêt
+    setTimeout(() => {
+        container.style.display = 'flex';
+        container.style.alignItems = 'center';
+        updateButtonLabels(); // Affichage initial correct
+    }, 1500); // Délai ajustable si nécessaire
+});
+
+</script>
+
+
+
+
+
+
+
+
+
+<div id="history-bar"></div>
+
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
+  }
+}
+</script>
+
+
+<script type="module" src="{{ url_for('static', filename='js/render.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/pyraminx-game.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/scan.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
+
+<script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

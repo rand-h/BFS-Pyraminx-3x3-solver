@@ -1,0 +1,148 @@
+{% extends 'base.html' %} 
+{% block title %}Analyse Pyraminx{% endblock %}
+
+{% block content %}
+
+
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Résultats de l'Analyse du Pyraminx</h1>
+    
+    <div class="row">
+        
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <a href="/3D_model" style="color: inherit; text-decoration: none;">
+
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-cube me-2"></i> Visualisation du Pyraminx
+                </div>
+                <div class="card-body text-center">
+                    
+                    
+                        <h3>Rendu 3D Interactif</h3>  
+                    
+                     <p class="text-muted">Modèle basé sur la configuration scannée.</p>
+
+                </a>
+
+                    <div id="orientation" class="fw-bold text-light mt-2" style="background: #222222;">Face: FRONT</div>
+                    <div id="pyraminx-3d" style="height: 300px; border-radius: 8px;">
+
+                    </div>
+
+                    <hr>
+
+
+                <a href="/scan" style="color: inherit; text-decoration: none;">
+
+                    <h3>Patron 2D</h3>
+                    <p class="text-muted">Aperçu de la configuration complète (utilisé pour la résolution).</p>
+                    <div id="patron-2d-display" style="width: auto;">
+                        <script>
+                            
+
+                        </script>
+                    </div>
+                </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-puzzle-piece me-2"></i> Formules et Métriques
+                </div>
+                <div class="card-body">
+                    
+                    <h3 class="mb-3">Formule de Résolution Principale</h3>
+                    
+                    <div class="alert alert-info fs-3 fw-semibold text-center h justify-content-center" role="alert">
+                        <p id="sequence" style=""> Calculate... </p>
+                    </div>
+                    
+                    <hr>
+
+                    <div class="row text-center mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h5>Face to start</h5>
+                                <p id="face_to_begin" class="lead text-primary fw-bold">
+                                   N/A
+                               </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h5>Fewest Move Count (FMC)</h5>
+                                <p id="move_count" class="lead text-primary fw-bold">
+                                   N/A mouvements
+                               </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h5>Temps Estimé (Normal)</h5>
+                                <p id="estimated_time" class="lead text-success fw-bold">
+                                    N/A secondes
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    <h3 class="mt-4">Algorithmes Détaillés</h3>
+                    
+                    <ul class="list-group">
+                        {% for algo in algos_details %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ algo.nom }}</strong> ({{ algo.temps_estime | default('N/A') }}s)
+                                <br>
+                                <small class="text-muted">Départ : Face **{{ algo.face_depart | default('N/A') }}**</small>
+                                <div class="mt-1">
+                                    <code>{{ algo.formule }}</code>
+                                </div>
+                            </div>
+                            <span class="badge bg-secondary rounded-pill">{{ algo.type }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    -->
+                    
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="/robot" class="btn btn-warning btn-lg shadow-sm">
+                    <i class="fas fa-robot me-2"></i> Envoyer au Robot Solveur
+                </a>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r127/three.min.js"></script>
+
+<script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
+      }
+    }
+</script>
+
+
+<script type="module" src="{{ url_for('static', filename='js/analyse.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+
+
+{% endblock %}
+
+

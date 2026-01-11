@@ -1,0 +1,82 @@
+.
+├── algorithms
+│   ├── solver
+│   │   ├── BFS
+│   │   │   ├── bgyr.bin
+│   │   │   ├── brgy.bin
+│   │   │   ├── byrg.bin
+│   │   │   ├── gbry.bin
+│   │   │   ├── gryb.bin
+│   │   │   ├── gybr.bin
+│   │   │   ├── rbyg.bin
+│   │   │   ├── rgby.bin
+│   │   │   ├── rygb.bin
+│   │   │   ├── ybgr.bin
+│   │   │   ├── ygrb.bin
+│   │   │   └── yrbg.bin
+│   │   ├── corrector
+│   │   ├── corrector.py
+│   │   ├── corrector_helper.c
+│   │   ├── fast_solver
+│   │   ├── fast_solver.exe
+│   │   ├── generateBFS.py
+│   │   ├── pyraminx.py
+│   │   ├── solver.py
+│   │   ├── solver_helper.c
+│   │   ├── test.ipynb
+│   │   └── test.py
+│   ├── scan.py
+│   └── utils.py
+├── patterns
+│   ├── pyraminx_1765828498753_4op2n7y.json
+│   └── pyraminx_1765944642651_8vkhcuz.json
+├── robot
+│   ├── __init__.py
+│   ├── compiler.sh
+│   ├── controller
+│   ├── controller.c
+│   └── controller_helper.py
+├── static
+│   ├── assets
+│   │   ├── css
+│   │   │   ├── scan.css
+│   │   │   └── styles.css
+│   │   └── js
+│   │       └── opencv.js
+│   ├── css
+│   │   ├── style.css
+│   │   ├── style3D.css
+│   │   └── styles.min.css
+│   ├── js
+│   │   ├── analyse.js
+│   │   ├── draw-scan-page.js
+│   │   ├── draw.js
+│   │   ├── image-process.js
+│   │   ├── pyraminx-game.js
+│   │   ├── render.js
+│   │   ├── scan.js
+│   │   └── utils.js
+│   ├── model 3D
+│   │   └── pyraminx.glb
+│   └── uploads
+│       ├── Modified_image.jpg
+│       └── pyraminxSavedImages.jpg
+├── templates
+│   ├── template
+│   │   └── untitled.html
+│   ├── analyse.html
+│   ├── base.html
+│   ├── edit.html
+│   ├── index.html
+│   ├── render3D.html
+│   ├── robot.html
+│   └── scan.html
+├── activate_venv.sh
+├── app.py
+├── list_files.py
+├── pyraminx-solver.bsdesign
+├── pyraminx_patron_gap.png
+├── repo.txt
+├── requirements.txt
+├── start_server.bat
+└── sync.ffs_db

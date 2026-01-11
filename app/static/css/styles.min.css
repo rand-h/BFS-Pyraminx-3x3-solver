@@ -1,0 +1,68 @@
+.pyraminx-face{width:80px;height:80px;background-color:#ccc;border:2px solid #343a40;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-weight:700;color:#343a40;transform:scale(1,-1) translate(0,-100%)}.scanned{border-color:#28a745;cursor:default}.face-status{position:absolute;bottom:2px;right:2px;font-size:.8rem;color:#fff}.pyraminx-face.scanned{cursor:default;opacity:.8}.face-color{fill:#000}.face-status-text{fill:#000;font-size:100px;text-anchor:middle;alignment-baseline:middle;display:none;pointer-events:none;font-family:Arial,sans-serif}.pyraminx-face.scanned .face-status-text{display:block}.pyraminx-face:hover{transform:scale(1,-1) translate(0,-99%)}body{background-color:#f8f9fa}.header-mobile{background:linear-gradient(45deg,#1e3c72 0,#2a5298 100%);color:#fff;padding:2rem 0;margin-bottom:1rem;border-bottom-left-radius:15px;border-bottom-right-radius:15px}.app-feature-card{background-color:#fff;border-radius:15px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 4px 10px rgba(0,0,0,.1);transition:transform .2s ease-in-out;text-decoration:none;color:inherit;display:block}.app-feature-card:hover{transform:translateY(-3px);box-shadow:0 6px 15px rgba(0,0,0,.15)}.icon-large{font-size:2.5rem;margin-bottom:.5rem}
+
+/* Style spécifique pour la barre de navigation du bas */
+#bottom-menu {
+    /* Ajoute une ombre douce vers le haut pour détacher la barre du contenu */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    padding: 10px 0; /* Un peu plus d'espace vertical */
+    z-index: 1050; /* S'assure qu'elle est au-dessus de tout */
+    background-color: rgba(255,255,255,0.7) !important;
+    border-radius: 30px;
+}
+
+#bottom-menu * {
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Force le container à bien espacer les éléments (Flexbox) */
+#bottom-menu .container {
+    display: flex;
+    justify-content: space-around; /* Espacement égal entre les icônes */
+    align-items: center;
+}
+
+/* Style des liens */
+#bottom-menu a {
+    text-decoration: none;
+    transition: all 0.3s ease; /* Animation fluide */
+    opacity: 0.7; /* Légèrement transparent par défaut */
+    position: relative;
+}
+
+/* Style des icônes */
+#bottom-menu i {
+    font-size: 1.4rem; /* Icônes un peu plus grandes */
+    margin-bottom: 4px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Effet rebond */
+}
+
+/* Style du texte */
+#bottom-menu span.small {
+    font-size: 0.7rem;
+    font-weight: 500;
+    display: block; /* S'assure que le texte est bien sous l'icône */
+}
+
+/* --- INTERACTIONS --- */
+
+/* Au survol (Hover) */
+#bottom-menu a:hover {
+    opacity: 1;
+    color: #0d6efd !important; /* Bleu Bootstrap (ou choisissez votre couleur) */
+}
+
+#bottom-menu a:hover i {
+    transform: translateY(-5px); /* L'icône remonte légèrement */
+}
+
+/* --- ÉTAT ACTIF (Page en cours) --- */
+/* Cette classe sera ajoutée via le HTML ci-dessous */
+#bottom-menu a.active-link {
+    opacity: 1;
+    color: #0d6efd !important; /* Force la couleur active (écrase text-dark) */
+    font-weight: bold;
+}
+
+#bottom-menu a.active-link i {
+    transform: translateY(-2px);
+}

@@ -1,0 +1,256 @@
+
+    body { margin: 0; overflow: hidden; background: #222; font-family: 'Segoe UI', sans-serif; color: white; touch-action: none;}
+    
+    #ui { 
+        position: absolute; top: 10px; left: 10px; 
+        background: rgba(0,0,0,0.85); padding: 15px; border-radius: 8px; width: 240px; 
+        pointer-events: none; backdrop-filter: blur(4px); border: 1px solid #444;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    
+    #ui * { pointer-events: auto; }
+    
+    h3 { margin: 0 0 10px 0; color: #00bc8c; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+
+    #orientation {
+        position: absolute; top: 20px; right: 20px;
+        background: rgba(0,0,0,0.8); padding: 8px 16px; border-radius: 20px;
+        font-weight: bold; color: #00ff00; font-size: 14px; pointer-events: none; border: 1px solid #00ff00;
+    }
+
+    #solved-banner {
+        position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+        background: rgba(0, 200, 0, 0.9); padding: 20px 40px; border-radius: 10px;
+        font-size: 40px; font-weight: 900; color: white; pointer-events: none;
+        display: none; box-shadow: 0 0 30px #00ff00; text-shadow: 2px 2px 0 #000;
+        z-index: 1000; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn { from { transform: translateX(-50%) scale(0); } to { transform: translateX(-50%) scale(1); } }
+
+    .controls { font-size: 12px; line-height: 1.5; color: #ccc; margin-top: 10px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px;}
+    kbd { background: #444; padding: 1px 5px; border-radius: 3px; font-weight: bold; color: #fff; border: 1px solid #666; font-family: monospace;}
+    
+    .action-group { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+    
+    button { 
+        background: #375a7f; color: white; border: none; padding: 10px; cursor: pointer; 
+        width: 100%; font-size: 13px; border-radius: 4px; font-weight: bold; transition: 0.2s;
+    }
+    button:hover { background: #2b4764; }
+    button:active { transform: translateY(1px); }
+
+    #btn-shuffle { background: #e74c3c; margin-top: 5px; }
+    #btn-shuffle:hover { background: #c0392b; }
+
+    input[type="text"] {
+        background: #222; border: 1px solid #555; color: white; padding: 8px; 
+        border-radius: 4px; width: 100%; box-sizing: border-box; font-family: monospace; 
+    }
+
+    hr { border-color: #444; opacity: 0.5; margin: 10px 0; }
+  
+
+    /* --- HISTORIQUE DES MOUVEMENTS --- */
+#history-bar {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; align-items: center;
+    background: rgba(0,0,0,0.6); padding: 8px 15px; border-radius: 8px;
+    backdrop-filter: blur(2px); border: 1px solid #444;
+    max-width: 80%; overflow-x: scroll; /* Cache ce qui dépasse */
+
+}
+
+.move-badge {
+    padding: 4px 10px; border-radius: 4px; font-weight: bold; font-family: monospace; font-size: 15px;
+    min-width: 20px; text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    animation: slideIn 0.2s ease-out; flex-shrink: 0; /* Empêche l'écrasement */
+}
+
+/* Couleurs selon la source */
+.source-manual  { background: #555; color: #fff; border: 1px solid #777; }
+.source-algo    { background: #3498db; color: white; border: 1px solid #2980b9; } /* Bleu */
+.source-shuffle { background: #e67e22; color: white; border: 1px solid #d35400; } /* Orange */
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.8); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+
+
+
+/* Custom scrollbar */
+/* ===== CUSTOM SCROLLBAR POUR #history-bar ===== */
+#history-bar::-webkit-scrollbar {
+    height: 10px;                    /* Épaisseur de la barre */
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+#history-bar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    margin: 0 4px;                   /* Petits espaces aux extrémités */
+}
+
+#history-bar::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 6px;
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 0 8px rgba(17, 255, 0, 0.938),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+#history-bar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, 
+        #7a0000 0%, 
+        #dcc600 50%, 
+        #427400 100%
+    );
+    box-shadow: 
+        0 0 15px rgba(0, 255, 150, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transform: scaleY(1.15);
+}
+
+#history-bar::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Animation douce au survol de la barre entière */
+#history-bar:hover::-webkit-scrollbar-thumb {
+    height: 14px;                   /* Un peu plus épaisse au hover */
+    margin-top: -2px;
+}
+
+
+
+#move-buttons {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    gap: 5px; 
+    top: 80px;
+    right: 20px;
+}
+
+
+#hide-description *{
+    margin-top: 3px;
+    background-color: rgba(68, 68, 68, 0.3);
+    height: 8px;
+    border-radius: 0 0 8px 8px;
+}
+
+#hide-controls:hover {
+    background-color:#444;
+}
+
+
+
+
+
+
+
+
+
+#move-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background-color: #2c2c2c1f;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.068);
+}
+
+#move-buttons button {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background-color: #444;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    font-family: consolas, monospace;
+}
+
+#move-buttons button:hover {
+    background-color: #555;
+    transform: scale(1.03);
+}
+
+#move-buttons button:active {
+    background-color: #333;
+    transform: scale(0.97);
+}
+
+/* Boutons spéciaux (reset et shuffle) */
+#btn-reset,
+#btn-shuffle {
+    background-color: #3a3a3a;
+    font-size: 16px;
+}
+
+#btn-reset {
+    transform: scale(1.15);
+}
+
+#btn-shuffle {
+    position: relative;
+}
+
+#btn-shuffle span {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.7);
+    font-size: 9px;
+    background-color: #333;
+    padding: 1px 4px;
+    border-radius: 3px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.15s ease, top 0.15s ease;
+}
+
+#btn-shuffle:hover span {
+    opacity: 1;
+    top: -22px;
+}
+
+/* Checkbox "Inverser" */
+#move-buttons label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #eee;
+    font-size: 11px;
+    user-select: none;
+    margin-left: 4px;
+}
+
+#invert-checkbox {
+    margin-right: 2px;
+    accent-color: #4CAF50;
+    transform: scale(0.9);
+}
+

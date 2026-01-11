@@ -1,0 +1,239 @@
+{% extends 'base.html' %} 
+{% block title %}Analyse Pyraminx{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="text-center mb-4"><i class="fas fa-camera"></i> Scan Face par Face</h2>
+        <p class="text-center text-muted"> Cliquez sur une face du Pyraminx ci-dessous pour lancer la capture et l'analyse. </p>
+
+        <div id="manualEditToggleArea" style="
+            display: flex;
+            align-content: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            user-select: none;
+ 
+
+            "> </div>
+
+        <div class="d-flex justify-content-center mb-5" id="pyraminxPatron">
+            <div id="pyraminxCanvasContainer" class="d-flex justify-content-center mb-5">
+                    <canvas id="pyraminxCanvas" width="720" height="440"></canvas>
+
+                   <!-- <script>
+                        document.addEventListener('DOMContentLoaded', async () => {
+                            const defaultState = {
+                                FRONT: Array(9).fill("ROUGE"),
+                                LEFT: Array(9).fill("BLEU"),
+                                RIGHT: Array(9).fill("VERT"),
+                                BOTTOM: Array(9).fill("JAUNE")
+                            };
+
+                            const savedState = await loadAndValidateSavedState();
+
+                            const state = savedState || defaultState;
+
+                            createPyraminxCanvas('pyraminxCanvasContainer', state);
+                        });
+                    </script> -->
+
+            </div>
+        </div>
+
+            <div class="d-flex justify-content-center align-items-center flex-column button-box">
+                
+                <style>
+                    .button-box {
+                        margin-top: -80px;
+                    }
+
+                    .face-button {
+                        padding: 10px;
+                        width: 100px;
+                        border-radius: 8px; /* Un arrondi plus standard */
+                        border: 1px solid #ccc;
+                        background-color: #f8f9fa;
+                        cursor: pointer;
+                        font-weight: bold;
+                        transition: all 0.2s;
+                    }
+
+                    .face-button:hover {
+                        background-color: #e2e6ea;
+                        transform: translateY(-2px);
+                    }
+
+                    /* Espacement pour la boîte du haut */
+                    .top-button-box {
+                        display: flex;
+                        gap: 10px; /* Espace entre les boutons (CSS moderne) */
+                        margin-bottom: 10px; /* Espace avec le bouton du bas */
+                    }
+                </style>
+
+                <div class="top-button-box">
+                    <button id ="FACE_btn" class="face-button" onclick="launchScanForFace('LEFT')">LEFT</button>
+                    <button id ="LEFT_btn" class="face-button" onclick="launchScanForFace('FRONT')">FRONT</button>
+                    <button id ="RIGHT_btn" class="face-button" onclick="launchScanForFace('RIGHT')">RIGHT</button>
+                    
+                </div>
+
+                <div class="under-button-box"> 
+                    <button id ="BOTTOM_btn" class="face-button" onclick="launchScanForFace('BOTTOM')">BOTTOM</button>
+                </div>
+
+                <div style="
+                    background-color: rgba(255, 152, 0, 0.15); 
+                    border-left: 4px solid #ff9800; 
+                    color: #9f5f00; 
+                    padding: 12px 16px; 
+                    margin: 10px 0; 
+                    border-radius: 4px; 
+                    font-family: sans-serif; 
+                    display: flex; 
+                    align-items: center; 
+                    gap: 10px;">
+                    
+                    <span style="font-size: 20px;">⚠️</span>
+                    <div>
+                        <strong style="color: rgb(159.38, 95, 0); display: block; margin-bottom: 2px;">Attention à l'orientation</strong>
+                        <span style="font-size: 0.95em;">Pour la face <strong>BOTTOM</strong>, prenez la photo en plaçant la <strong>pointe N° 0 vers le haut</strong> (▲) !</span>
+                    </div>
+                </div>
+
+            </div>
+
+        <hr>
+        
+        <div class="card shadow p-3 mb-4" id="cameraArea" style="display:none;">
+            <h4 class="text-center text-primary mb-3" id="currentFaceTitle">Scan de la Face : FRONT</h4>
+            
+            <div class="text-center bg-dark rounded overflow-hidden">
+                <div id="videoContainer">
+                <video id="video" style="display:none; width:100%;" autoplay playsinline></video>
+                <img id="piVideoFeed" src="" style="display:none; width:100%;">
+            </div>
+
+                <img id="uploadedImagePreview" style="display:none; max-height:300px; object-fit:contain; width:100%;" />
+            </div>
+            
+            <div class="d-grid gap-2 mt-3 image-take-action">
+
+                <label id="choose-cam" for="cameraSelect">Source Vidéo :</label>
+                    <select id="cameraSelect" class="form-select mb-2" onchange="startCamera()">
+            <option value="" disabled selected>Choisir une caméra...</option> <option value="pi_camera">Caméra du Raspberry Pi (Serveur)</option>
+            </select>
+
+            <div id="camera-warning" style="display: none; background-color: #ffcccc; color: #cc0000; padding: 10px; text-align: center;"> 
+    <span>⚠️ Veuillez autoriser l'accès à la caméra dans les paramètres du navigateur !</span>
+</div>
+
+
+                <style>
+                    /* 1. FORCE L'ASPECT COMPACT (Écrase btn-lg) */
+                    #captureButton, #editPhoto, #uploadButton, #stopCameraButton, #retakeButton, #validateButton {
+                        padding: 6px 14px !important;       /* Beaucoup moins de "gras" autour du texte */
+                        font-size: 0.85rem !important;      /* Texte plus fin */
+                        line-height: 1.2 !important;
+                        border-radius: 8px !important;     /* Arrondi type "pilule" */
+                        margin: 3px !important;             /* Espace entre les boutons réduit */
+                        display: inline-flex !important;    
+                        align-items: center;
+                        justify-content: center;
+                        width: auto !important;             /* Empêche de prendre toute la largeur */
+                        height: auto !important;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        text-transform: none !important;    /* Pas de majuscules forcées */
+                    }
+
+                    /* 2. GESTION DU BOUTON STOP (Écrase mt-3) */
+                    #stopCameraButton {
+                        /* On force le bouton stop à se coller aux autres sans la grosse marge du haut */
+                        margin-top: 3px !important; 
+                        font-size: 0.8rem !important;
+                        padding: 5px 10px !important;
+                    }
+
+                    /* 3. CONTENEUR SCAN CONTROLS */
+                    #scanControls {
+                        /* On s'assure que ces boutons sont centrés quand ils apparaissent */
+                        text-align: center;
+                        margin-bottom: 5px !important;
+                        margin-top: 5px !important;
+                    }
+
+                    /* 4. OPTIMISATION MOBILE (Le secret pour gagner de la place) */
+                    /* Si l'écran est petit (téléphone), on cache le texte et on garde que l'icône */
+                    @media (max-width: 600px) {
+                        #captureButton, #editPhoto, #uploadButton, #stopCameraButton {
+                            font-size: 0 !important; /* Cache le texte */
+                            padding: 8px 12px !important; /* Carré autour de l'icône */
+                        }
+                        /* On ré-affiche la taille de l'icône */
+                        #captureButton i, #editPhoto i, #uploadButton i, #stopCameraButton i {
+                            font-size: 1.2rem !important; 
+                            margin-right: 0 !important; /* Enlève la marge de l'icône */
+                        }
+                    }
+                </style>
+
+                <div id="scanControls" style="display:none; margin-top: 10px;">
+                    <button id="retakeButton" class="btn btn-warning">↺ Recommencer</button>
+                    <button id="validateButton" class="btn btn-success">✓ Valider</button>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="btn btn-primary btn-lg" id="captureButton">
+                        <i class="fas fa-camera me-2"></i> Capturer 
+                    </button>
+
+                    <button class="btn btn-lg border" id="editPhoto">
+                        <i class="fas fa-crop me-2"></i> Recadrer
+                    </button>
+                    
+                    <button class="btn btn-secondary btn-lg" id="uploadButton">
+                        <i class="fas fa-upload me-2"></i> Charger
+                    </button>
+                    
+                    <input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+                    <button class="btn btn-danger mt-3 btn-lg" id="stopCameraButton" style="display: none;">
+                        <i class="fas fa-video-slash me-2"></i> Stop
+                    </button>
+                </div>
+
+
+
+            </div>
+        </div>
+        
+        <canvas id="canvas" style="display:none;"></canvas>
+        
+        <div class="text-center mt-3" id="statusArea">
+            <div class="text-primary spinner-border" id="loadingSpinner" role="status" style="display:none;">
+                <span class="visually-hidden">Traitement...</span>
+            </div>
+            <p class="text-info mt-2" id="messageText">Cliquez sur une face du patron pour commencer.</p>
+        </div>
+        
+        <div class="d-grid gap-2 mt-5">
+            <button class="btn btn-warning btn-lg disabled" id="saveStateButton" style="display:none;">
+    <i class="fas fa-save me-2"></i> Sauvegarder l'État Actuel
+</button>
+            <button class="btn btn-success btn-lg disabled" id="goTo3DButton" style="display:none;">
+                <i class="fas fa-eye me-2"></i> Voir en 3D & Analyse 
+            </button> 
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+
+
+<script src="{{ url_for('static', filename='js/draw-scan-page.js') }}"></script>
+
+
+{% endblock %}

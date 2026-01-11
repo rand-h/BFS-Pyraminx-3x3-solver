@@ -1,0 +1,70 @@
+/* Styles CSS pour dessiner le patron 2D du Pyraminx */
+
+.pyraminx-face {
+  width: 80px;
+  height: 80px;
+  background-color: #cccccc;
+  border: 2px solid #343a40;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  font-weight: bold;
+  color: #343a40;
+}
+
+/* Classe pour les faces scannées */
+
+.scanned {
+  border-color: #28a745;
+  cursor: default;
+}
+
+.face-status {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+  color: white;
+}
+
+/* * STYLES SPÉCIFIQUES AU SVG
+             * NOTE: Les coordonnées et chemins dans le SVG sont très détaillés. 
+             * Nous allons styliser les éléments <use> pour la couleur. */
+
+.pyraminx-face.scanned {
+  cursor: default;
+  opacity: 0.8;
+}
+
+/* Les faces colorées (la seconde <use> dans ton SVG) */
+
+.face-color {
+  fill: #000;
+}
+
+/* Styles pour le Texte (le symbole ✓ que j'ai ajouté dans ton SVG) */
+
+.face-status-text {
+  fill: #000;
+  font-size: 100px;
+  text-anchor: middle;
+  alignment-baseline: middle;
+  display: none;
+  pointer-events: none;
+  font-family: Arial, sans-serif;
+}
+
+.pyraminx-face.scanned .face-status-text {
+  display: block;
+}
+
+.pyraminx-face {
+  transform: scale(1, -1) translate(0, -100%);
+}
+
+.pyraminx-face:hover {
+  transform: scale(1, -1) translate(0, -99%);
+}
+

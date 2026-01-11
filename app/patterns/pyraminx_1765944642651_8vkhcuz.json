@@ -1,0 +1,55 @@
+{
+  "pattern": {
+    "FRONT": [
+      "ROUGE",
+      "VERT",
+      "ROUGE",
+      "ROUGE",
+      "JAUNE",
+      "JAUNE",
+      "JAUNE",
+      "VERT",
+      "VERT"
+    ],
+    "RIGHT": [
+      "JAUNE",
+      "VERT",
+      "BLEU",
+      "ROUGE",
+      "JAUNE",
+      "ROUGE",
+      "BLEU",
+      "ROUGE",
+      "ROUGE"
+    ],
+    "LEFT": [
+      "ROUGE",
+      "VERT",
+      "JAUNE",
+      "ROUGE",
+      "BLEU",
+      "BLEU",
+      "BLEU",
+      "JAUNE",
+      "BLEU"
+    ],
+    "BOTTOM": [
+      "VERT",
+      "JAUNE",
+      "VERT",
+      "ROUGE",
+      "ROUGE",
+      "VERT",
+      "VERT",
+      "BLEU",
+      "VERT"
+    ]
+  },
+  "metadata": {
+    "timestamp": "2025-12-17T04:10:42.651Z",
+    "totalFaces": 4,
+    "facesScanned": 4,
+    "source": "web_scanner_v1",
+    "saved_at": "2025-12-17T05:10:42.689446"
+  }
+}

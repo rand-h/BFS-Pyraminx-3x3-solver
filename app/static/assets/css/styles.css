@@ -1,0 +1,86 @@
+/* Styles pour simuler le look d'une application */
+
+body {
+  background-color: #f8f9fa;
+}
+
+.header-mobile {
+  background: linear-gradient(45deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 1rem;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.app-feature-card {
+  background-color: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.app-feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.icon-large {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Juste pour voir l'effet de transparence */
+}
+
+.nav-bar-custom {
+    position: fixed;
+    bottom: 20px; /* Décollé du bas */
+    left: 50%;
+    transform: translateX(-50%); /* Centré horizontalement */
+    width: 90%; /* Ne prend pas toute la largeur */
+    max-width: 400px; /* Largeur max sur PC */
+    
+    /* L'effet Verre (Glassmorphism) */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    border-radius: 30px; /* Très arrondi */
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    z-index: 1000;
+}
+
+.nav-bar-custom a {
+    text-decoration: none !important;
+    color: #333 !important;
+    position: relative;
+    padding: 10px;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.nav-bar-custom span {
+    display: none; /* On cache le texte pour un look minimaliste, ou gardez-le si vous préférez */
+}
+
+.nav-bar-custom i {
+    font-size: 1.3rem;
+}
+
+/* Effet Hover : Cercle de couleur */
+.nav-bar-custom a:hover {
+    background-color: rgba(108, 92, 231, 0.1);
+    color: #6c5ce7 !important;
+}
