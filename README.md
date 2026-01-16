@@ -8,7 +8,7 @@ The application is built with Python (Flask) for the web interface and C for the
 
 ### Key Features
 
-* **Optimal Resolution:** Finds the shortest solution sequence (11 moves or fewer).
+* **Optimal Resolution:** Finds the shortest solution sequence (11 moves or fewer without tips).
 * **Computer Vision:** Detects colors automatically using OpenCV.
 * **Web Interface:** A simple responsive interface to scan and view the solution.
 * **Performance:** The search algorithm is implemented in C to ensure fast execution times.
