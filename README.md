@@ -94,7 +94,7 @@ The core logic for the BFS algorithm was inspired by the repository:
 ## Author
 ```tex
 @misc{BFS_Pyraminx_3x3_Solver,
-  author       = {Hosea Hasiniela Randrianarisoa},
+  author       = {rand-h},
   title        = {Pyraminx Solver: BFS Algorithm and IoT Interface},
   howpublished = {\url{https://github.com/rand-h/BFS-Pyraminx-3x3-solver}},
   year         = {2026},
